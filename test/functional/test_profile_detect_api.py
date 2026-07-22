@@ -1,3 +1,4 @@
+import os
 import platform
 import textwrap
 
@@ -5,6 +6,7 @@ import pytest
 
 from conan.internal.api.detect import detect_api
 from conan.test.utils.tools import TestClient, default_vs_ide_version, default_msvc_version
+from test.conftest import tools_locations
 
 
 class TestProfileDetectAPI:
@@ -44,24 +46,28 @@ class TestProfileDetectAPI:
             """)
         assert expected in client.out
 
+    @pytest.mark.tool("ldd")
     @pytest.mark.skipif(platform.system() != "Linux", reason="Only linux")
     def test_profile_detect_libc(self):
         client = TestClient()
-        tpl1 = textwrap.dedent("""
-            {% set compiler, version, _ = detect_api.detect_gcc_compiler() %}
-            {% set libc, libc_version = detect_api.detect_libc() %}
+        ldd_path = tools_locations["ldd"]["system"]["path"][platform.system()]
+        ldd_exe = tools_locations["ldd"]["exe"]
+        ldd = os.path.join(ldd_path, ldd_exe)
+        tpl1 = textwrap.dedent(f"""
+            {{% set compiler, version, _ = detect_api.detect_gcc_compiler() %}}
+            {{% set libc, libc_version = detect_api.detect_libc(ldd = \"{ldd}\") %}}
             [settings]
             os=Linux
-            compiler={{compiler}}
-            compiler.version={{version}}
+            compiler={{{{compiler}}}}
+            compiler.version={{{{version}}}}
             [conf]
-            user.confvar:libc={{libc}}
-            user.confvar:libc_version={{libc_version}}
+            user.confvar:libc={{{{libc}}}}
+            user.confvar:libc_version={{{{libc_version}}}}
             """)
 
         client.save({"profile1": tpl1})
         client.run("profile show -pr=profile1 --context=host")
-        libc_name, libc_version = detect_api.detect_libc()
+        libc_name, libc_version = detect_api.detect_libc(ldd = ldd)
         assert libc_name is not None
         assert libc_version is not None
         _, version, _ = detect_api.detect_gcc_compiler()
