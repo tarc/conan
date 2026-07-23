@@ -114,3 +114,5 @@ Session.vim
 
 .claude
 .covtest
+
+uv.lock
