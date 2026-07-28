@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 
 from conan.api.output import ConanOutput, cli_out_write
 from conan.cli.command import conan_command, conan_subcommand
@@ -10,10 +11,10 @@ from conan.errors import ConanException
 
 def _print_profiles(profiles):
     if "host" in profiles:
-        ConanOutput().info("Host profile:")
+        ConanOutput().info("Host profile:", stream=sys.stdout)
         cli_out_write(profiles["host"].dumps())
     if "build" in profiles:
-        ConanOutput().info("Build profile:")
+        ConanOutput().info("Build profile:", stream=sys.stdout)
         cli_out_write(profiles["build"].dumps())
 
 
