@@ -107,13 +107,13 @@ def test_profile_show_aggregate_usecase(context, f):
 
     if context == "host":
         if f == "text":
-            assert "Host profile:" not in tc.stdout
-            assert "Host profile:" in tc.stderr
+            assert "Host profile:" in tc.stdout
+            assert "Host profile:" not in tc.stderr
         assert "Linux" not in tc.out
     if context == "build":
         if f == "text":
-            assert "Build profile:" not in tc.stdout
-            assert "Build profile:" in tc.stderr
+            assert "Build profile:" in tc.stdout
+            assert "Build profile:" not in tc.stderr
         assert "Windows" not in tc.out
 
     if context in (None, "host"):

@@ -212,7 +212,7 @@ class ConanOutput:
         self._write_message(msg, newline=newline)
         return self
 
-    def _write_message(self, msg, fg=None, bg=None, newline=True):
+    def _write_message(self, msg, fg=None, bg=None, newline=True, stream=None):
         if isinstance(msg, dict):
             # For traces we can receive a dict already, we try to transform then into more natural
             # text
@@ -235,9 +235,11 @@ class ConanOutput:
         if newline:
             ret = f"{ret}\n"
 
+        stream = stream or self.stream
+
         with self.lock:
-            self.stream.write(ret)
-            self.stream.flush()
+            stream.write(ret)
+            stream.flush()
 
     def trace(self, msg: str):
         """ This is the most extreme level of detail.
@@ -279,13 +281,13 @@ class ConanOutput:
             self._write_message(msg, fg=fg, bg=bg)
         return self
 
-    def status(self, msg: str, fg: str = None, bg: str = None, newline: bool = True):
+    def status(self, msg: str, fg: str = None, bg: str = None, newline: bool = True, stream = None):
         """ Provides general information about the system or ongoing operations.
 
         Info messages are basic and used to inform about common events,
         like the start or completion of processes, without implying specific problems or achievements."""
         if self._conan_output_level <= LEVEL_STATUS:
-            self._write_message(msg, fg=fg, bg=bg, newline=newline)
+            self._write_message(msg, fg=fg, bg=bg, newline=newline, stream=stream)
         return self
 
     info = status
